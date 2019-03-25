@@ -6,6 +6,7 @@ using MimeTypes;
 using Microsoft.WindowsAzure.MediaServices.Client;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System.Linq;
+using System.Text;
 
 const string staticFilesFolder = "www";
 static string defaultPage = string.IsNullOrEmpty(GetEnvironmentVariable("DEFAULT_PAGE")) ? 
@@ -45,7 +46,7 @@ public static HttpResponseMessage Run(HttpRequestMessage req, TraceWriter log)
             var assetLocator = asset.Locators.FirstOrDefault();
             string url = "//" + _context.StreamingEndpoints.FirstOrDefault().HostName + "/" + assetLocator.Path + "/" + program.ManifestName + ".ism/manifest";
             log.Info($"Program URL: {url}");
-            string data = File.ReadAllText(path).Replace("insertprogramurlhere", url);
+            string data = File.ReadAllText(filePath).Replace("insertprogramurlhere", url);
             byte[] bytes = Encoding.ASCII.GetBytes(data);
             myStream = new MemoryStream(bytes);
         }
