@@ -42,7 +42,7 @@ public static HttpResponseMessage Run(HttpRequestMessage req, TraceWriter log)
             var program = channel.Programs.Where(p => p.Name == "Program1").FirstOrDefault();
             var asset  = program.Asset;
             var assetLocator = asset.Locators.FirstOrDefault();
-            string url = "//" + _context.StreamingEndpoints.FirstOrDefault().HostName + "/" + assetLocator.Id + "/" + program.ManifestName + "/manifest";
+            string url = "//" + _context.StreamingEndpoints.FirstOrDefault().HostName + "/" + assetLocator.Path + "/" + program.ManifestName + ".ism/manifest";
             log.Info($"Program URL: {url}");
 
 
