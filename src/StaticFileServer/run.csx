@@ -44,9 +44,9 @@ public static HttpResponseMessage Run(HttpRequestMessage req, TraceWriter log)
             var program = channel.Programs.Where(p => p.Name == "Program1").FirstOrDefault();
             var asset  = program.Asset;
             var assetLocator = asset.Locators.FirstOrDefault();
-            string url = "//" + _context.StreamingEndpoints.FirstOrDefault().HostName + "/" + assetLocator.Path + "/" + program.ManifestName + ".ism/manifest";
+            string url = assetLocator.Path + "/" + program.ManifestName + ".ism/manifest";
             log.Info($"Program URL: {url}");
-            string data = File.ReadAllText(filePath).Replace("insertprogramurlhere", url);
+            string data = File.ReadAllText(filePath).Replace("insertprogramurlhere", url.Substring(5));
             byte[] bytes = Encoding.ASCII.GetBytes(data);
             myStream = new MemoryStream(bytes);
         }
