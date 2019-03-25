@@ -3,16 +3,48 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.IO;
 using MimeTypes;
+using Microsoft.WindowsAzure.MediaServices.Client;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using System.Linq;
 
 const string staticFilesFolder = "www";
 static string defaultPage = string.IsNullOrEmpty(GetEnvironmentVariable("DEFAULT_PAGE")) ? 
     "index.html" : GetEnvironmentVariable("DEFAULT_PAGE");
+
+static readonly string _AADTenantDomain = Environment.GetEnvironmentVariable("AMSAADTenantDomain");
+static readonly string _RESTAPIEndpoint = Environment.GetEnvironmentVariable("AMSRESTAPIEndpoint");
+
+static readonly string _mediaservicesClientId = Environment.GetEnvironmentVariable("AMSClientId");
+static readonly string _mediaservicesClientSecret = Environment.GetEnvironmentVariable("AMSClientSecret");
+
+// Field for service context.
+private static CloudMediaContext _context = null;
 
 public static HttpResponseMessage Run(HttpRequestMessage req, TraceWriter log)
 {
     try
     {
         var filePath = GetFilePath(req, log);
+
+        if (filePath.EndsWith("player.html"))
+        {
+            // Load AMS account context
+            log.Info($"Using Azure Media Service Rest API Endpoint : {_RESTAPIEndpoint}");
+
+            AzureAdTokenCredentials tokenCredentials = new AzureAdTokenCredentials(_AADTenantDomain,
+                                  new AzureAdClientSymmetricKey(_mediaservicesClientId, _mediaservicesClientSecret),
+                                  AzureEnvironments.AzureCloudEnvironment);
+
+            AzureAdTokenProvider tokenProvider = new AzureAdTokenProvider(tokenCredentials);
+
+            _context = new CloudMediaContext(new Uri(_RESTAPIEndpoint), tokenProvider);
+            var program = _context.Programs.Where(p => p.Channel.Name == "Channel1").FirstOrDefault();
+            var assetLocator = _context.Assets.Where(a => a.Id == program.AssetId).FirstOrDefault()?.Locators.FirstOrDefault();
+            string url = "//" + _context.StreamingEndpoints.FirstOrDefault().HostName + "/" + assetLocator.Id + "/" + program.ManifestName + "/manifest";
+            log.Info($"Program URL: {url}");
+
+
+        }
 
         var response = new HttpResponseMessage(HttpStatusCode.OK);
         var stream = new FileStream(filePath, FileMode.Open);

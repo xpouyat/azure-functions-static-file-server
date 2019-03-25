@@ -2,7 +2,9 @@
   "frameworks": {
     "net46":{
       "dependencies": {
-        "MediaTypeMap": "2.1.0"
+        "MediaTypeMap": "2.1.0",
+        "windowsazure.mediaservices": "4.2.0.0",
+        "windowsazure.mediaservices.extensions": "4.2.0.0"
       }
     }
    }
