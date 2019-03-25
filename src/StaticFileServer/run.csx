@@ -38,8 +38,10 @@ public static HttpResponseMessage Run(HttpRequestMessage req, TraceWriter log)
             AzureAdTokenProvider tokenProvider = new AzureAdTokenProvider(tokenCredentials);
 
             _context = new CloudMediaContext(new Uri(_RESTAPIEndpoint), tokenProvider);
-            var program = _context.Programs.Where(p => p.Channel.Name == "Channel1").FirstOrDefault();
-            var assetLocator = _context.Assets.Where(a => a.Id == program.AssetId).FirstOrDefault()?.Locators.FirstOrDefault();
+            var channel = _context.Channels.Where(c => c.Name == "Channel1").FirstOrDefault();
+            var program = channel.Programs.Where(p => p.Name == "Program1").FirstOrDefault();
+            var asset  = program.Asset;
+            var assetLocator = asset.Locators.FirstOrDefault();
             string url = "//" + _context.StreamingEndpoints.FirstOrDefault().HostName + "/" + assetLocator.Id + "/" + program.ManifestName + "/manifest";
             log.Info($"Program URL: {url}");
 
