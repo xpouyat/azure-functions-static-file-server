@@ -26,6 +26,7 @@ public static HttpResponseMessage Run(HttpRequestMessage req, TraceWriter log)
     {
         var filePath = GetFilePath(req, log);
 
+        stream myStream = null;
         if (filePath.EndsWith("player.html"))
         {
             // Load AMS account context
@@ -44,13 +45,17 @@ public static HttpResponseMessage Run(HttpRequestMessage req, TraceWriter log)
             var assetLocator = asset.Locators.FirstOrDefault();
             string url = "//" + _context.StreamingEndpoints.FirstOrDefault().HostName + "/" + assetLocator.Path + "/" + program.ManifestName + ".ism/manifest";
             log.Info($"Program URL: {url}");
-
-
+            string data = File.ReadAllText(path).Replace("insertprogramurlhere", url);
+            byte[] bytes = Encoding.ASCII.GetBytes(data);
+            myStream = new MemoryStream(bytes);
+        }
+        else
+        {
+            myStream = new FileStream(filePath, FileMode.Open);
         }
 
         var response = new HttpResponseMessage(HttpStatusCode.OK);
-        var stream = new FileStream(filePath, FileMode.Open);
-        response.Content = new StreamContent(stream);
+        response.Content = new StreamContent(myStream);
         response.Content.Headers.ContentType = new MediaTypeHeaderValue(GetMimeType(filePath));
         return response;
     }
