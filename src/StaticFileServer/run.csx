@@ -26,7 +26,7 @@ public static HttpResponseMessage Run(HttpRequestMessage req, TraceWriter log)
     {
         var filePath = GetFilePath(req, log);
 
-        stream myStream = null;
+        Stream myStream = null;
         if (filePath.EndsWith("player.html"))
         {
             // Load AMS account context
