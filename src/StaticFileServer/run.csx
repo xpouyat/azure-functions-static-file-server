@@ -10,7 +10,7 @@ using System.Text;
 
 const string staticFilesFolder = "www";
 static string defaultPage = string.IsNullOrEmpty(GetEnvironmentVariable("DEFAULT_PAGE")) ? 
-    "index.html" : GetEnvironmentVariable("DEFAULT_PAGE");
+    "player.html" : GetEnvironmentVariable("DEFAULT_PAGE");
 
 static readonly string _AADTenantDomain = Environment.GetEnvironmentVariable("AMSAADTenantDomain");
 static readonly string _RESTAPIEndpoint = Environment.GetEnvironmentVariable("AMSRESTAPIEndpoint");
